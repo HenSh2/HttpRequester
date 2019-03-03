@@ -9,7 +9,8 @@ Pod::Spec.new do |s|
   s.license       = "MIT"
   s.author        = { "HenSh" => "hensh2@gmail.com" }
   s.platform      = :ios, "10.0"
-  s.source        = { :git => "https://github.com/HenSh2/HttpRequester.git", :tag => s.version }
-  s.source_files  = "HttpRequester"
+  s.source        = { :git => "https://github.com/HenSh2/HttpRequester.git", :tag => "1.0.0" }
+  s.source_files  = "HttpRequester/**/*.swift"
+  s.swift_version = "4.2"
 
 end

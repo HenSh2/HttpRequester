@@ -15,7 +15,7 @@ public class HttpRequester {
     public static let shared: HttpRequester = HttpRequester()
     
     public func request() {
-        print("request")
+        print("request test")
     }
     
 }
