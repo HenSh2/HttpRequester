@@ -33,7 +33,7 @@ public class HttpRequester {
     
     private let sessionConfiguration: URLSessionConfiguration = URLSessionConfiguration.default
     
-    private func request(urlString: String, httpMethod: HttpMethod = HttpMethod.GET,
+    func request(urlString: String, httpMethod: HttpMethod = HttpMethod.GET,
                          headerType: HeaderField = .ApplicationJson,
                          headerParams: [String: String]? = nil,
                          bodyParams: [String: Any]? = nil,
