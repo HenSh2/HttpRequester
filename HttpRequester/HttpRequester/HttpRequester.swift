@@ -80,7 +80,7 @@ public class HttpRequester {
         URLSession(configuration: self.sessionConfiguration).dataTask(with: request) { (data, response, error) in
             guard error != nil else {
                 let statusCode = (response as! HTTPURLResponse).statusCode
-                self.debugPrint("URL --->>> \(response?.url?.absoluteString ?? ""), statusCode --->>> \(statusCode)")
+                self.debugPrint("HttpMethod = \(httpMethod.rawValue), URL --->>> \(response?.url?.absoluteString ?? ""), statusCode --->>> \(statusCode)")
                 guard let data = data else {
                     self.debugPrint("raw data is empty")
                     completion(Data(), statusCode, false)
@@ -116,6 +116,7 @@ public class HttpRequester {
     private func debugPrint(_ str: String) {
         //Print only in debug mode (ignore in release)
         #if DEBUG
+        print("HttpRequester --->>> Print only in debug mode")
         print(str)
         #endif
     }
