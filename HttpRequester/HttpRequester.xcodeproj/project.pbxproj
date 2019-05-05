@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		993F21D8222C4CE00077449B /* HttpRequester.h in Headers */ = {isa = PBXBuildFile; fileRef = 993F21D6222C4CE00077449B /* HttpRequester.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		993F21DF222C4D1D0077449B /* HttpRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 993F21DE222C4D1D0077449B /* HttpRequester.swift */; };
+		996C14E3227F4A9800D88EDA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996C14E2227F4A9800D88EDA /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +17,7 @@
 		993F21D6222C4CE00077449B /* HttpRequester.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpRequester.h; sourceTree = "<group>"; };
 		993F21D7222C4CE00077449B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		993F21DE222C4D1D0077449B /* HttpRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpRequester.swift; sourceTree = "<group>"; };
+		996C14E2227F4A9800D88EDA /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +53,7 @@
 				993F21D6222C4CE00077449B /* HttpRequester.h */,
 				993F21D7222C4CE00077449B /* Info.plist */,
 				993F21DE222C4D1D0077449B /* HttpRequester.swift */,
+				996C14E2227F4A9800D88EDA /* Extensions.swift */,
 			);
 			path = HttpRequester;
 			sourceTree = "<group>";
@@ -135,6 +138,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				993F21DF222C4D1D0077449B /* HttpRequester.swift in Sources */,
+				996C14E3227F4A9800D88EDA /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

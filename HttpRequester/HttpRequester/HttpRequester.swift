@@ -18,7 +18,8 @@ public enum HttpMethod: String {
 }
 
 public enum HeaderField: String {
-    case ApplicationJson = "Application/json"
+    case ApplicationJson = "application/json"
+    case MultiPart = "multipart/form-data"
     case None = ""
 }
 
@@ -33,11 +34,53 @@ public class HttpRequester {
     
     private let sessionConfiguration: URLSessionConfiguration = URLSessionConfiguration.default
     
-    public func request(urlString: String, httpMethod: HttpMethod = HttpMethod.GET,
-                         headerType: HeaderField = .ApplicationJson,
-                         headerParams: [String: String]? = nil,
-                         bodyParams: [String: Any]? = nil,
-                         queryParams: [String: String]? = nil,
+    public func request(urlString: String,
+                        httpMethod: HttpMethod = HttpMethod.GET,
+                        headerType: HeaderField = .ApplicationJson,
+                        headerParams: [String: String]? = nil,
+                        bodyParams: [String: Any]? = nil,
+                        queryParams: [String: String]? = nil,
+                        completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
+        self.request(urlString: urlString,
+                     httpMethod: httpMethod,
+                     headerType: headerType,
+                     headerParams: headerParams,
+                     bodyParams: bodyParams,
+                     queryParams: queryParams,
+                     dataArray: nil,
+                     namesArray: nil) { (data, statusCode, error) in
+                        completion(data, statusCode, error)
+        }
+    }
+    
+    public func uploadMultiPart(urlString: String,
+                                httpMethod: HttpMethod = HttpMethod.POST,
+                                headerParams: [String: String]? = nil,
+                                bodyParams: [String: Any]? = nil,
+                                queryParams: [String: String]? = nil,
+                                dataArray: [Data?]? = nil,
+                                namesArray: [String]? = nil,
+                                completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
+        self.request(urlString: urlString,
+                     httpMethod: httpMethod,
+                     headerType: .MultiPart,
+                     headerParams: headerParams,
+                     bodyParams: bodyParams,
+                     queryParams: queryParams,
+                     dataArray: dataArray,
+                     namesArray: namesArray) { (data, statusCode, error) in
+                        completion(data, statusCode, error)
+        }
+    }
+    
+    private func request(urlString: String,
+                         httpMethod: HttpMethod,
+                         headerType: HeaderField,
+                         headerParams: [String: String]?,
+                         bodyParams: [String: Any]?,
+                         queryParams: [String: String]?,
+                         dataArray: [Data?]? = nil,
+                         namesArray: [String]? = nil,
                          completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
         
         //Check for vaild main url
@@ -63,12 +106,22 @@ public class HttpRequester {
         
         //Init Content-Type
         if headerType != .None {
-            let values = self.headerField(value: headerType)
-            request.setValue(values["value"], forHTTPHeaderField: values["type"]!)
+            if headerType == .MultiPart {
+                let boundaryId: String = "Boundary-\(UUID().uuidString)"
+                request.setValue("multipart/form-data; boundary=\(boundaryId)", forHTTPHeaderField: "Content-Type")
+                let body: Data = self.dataBody(bodyParams: bodyParams,
+                                               data: dataArray,
+                                               namesArray: namesArray,
+                                               boundaryId: boundaryId)
+                request.httpBody = body
+            } else {
+                let values = self.headerField(value: headerType)
+                request.setValue(values["value"], forHTTPHeaderField: values["type"]!)
+            }
         }
         
         //Check for vaild body params and add to request
-        if let params = bodyParams {
+        if let params = bodyParams, headerType != .MultiPart {
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
             } catch let bodyParamsError {
@@ -79,8 +132,8 @@ public class HttpRequester {
         
         URLSession(configuration: self.sessionConfiguration).dataTask(with: request) { (data, response, error) in
             guard error != nil else {
-                let statusCode = (response as! HTTPURLResponse).statusCode
-                self.debugPrint("HttpMethod = \(httpMethod.rawValue), URL --->>> \(response?.url?.absoluteString ?? ""), statusCode --->>> \(statusCode)")
+                let statusCode: Int = (response as? HTTPURLResponse)?.statusCode ?? 0
+                self.debugPrint("URL --->>> \(response?.url?.absoluteString ?? "response is nil"), statusCode --->>> \(statusCode)")
                 guard let data = data else {
                     self.debugPrint("raw data is empty")
                     completion(Data(), statusCode, false)
@@ -89,6 +142,7 @@ public class HttpRequester {
                 completion(data, statusCode, false)
                 return
             }
+            self.debugPrint("URL --->>> \(response?.url?.absoluteString ?? "response is nil"), error --->>> \(error.debugDescription)")
             DispatchQueue.main.async {
                 completion(Data(), 0, true)
             }
@@ -113,13 +167,65 @@ public class HttpRequester {
         return String(querey.dropLast())
     }
     
-    private func debugPrint(_ str: String) {
+    func dataBody(bodyParams: [String: Any]?,
+                  data: [Data?]?,
+                  namesArray: [String]?,
+                  boundaryId: String) -> Data {
+        guard let data = data else {
+            self.debugPrint("can't create data body, data is empty")
+            return Data()
+        }
+        
+        guard let bParams = bodyParams as? [String: String] else {
+            self.debugPrint("provide only strings in body params --->>> [String: String]")
+            return Data()
+        }
+        
+        let lineBreak: String = "\r\n"
+        let contentDisposition: String = "Content-Disposition: form-data;"
+        var body = Data()
+        
+        //Add all body params as data
+        for (key, value) in bParams {
+            body.appendString("--\(boundaryId + lineBreak)")
+            body.appendString("\(contentDisposition) name=\"\(key)\"\(lineBreak + lineBreak)")
+            body.appendString("\(value + lineBreak)")
+        }
+        
+        //Add data with boundary
+        for (i, dat) in data.enumerated() {
+            if let d = dat {
+                body.appendString("--\(boundaryId + lineBreak)")
+                body.appendString("\(contentDisposition) name=\"attachments\"; filename=\(self.getFileName(index: i, namesArray: namesArray))\(lineBreak)")
+                body.appendString("Content-Type: image/jpeg" + "\(lineBreak + lineBreak)")
+                body.append(d)
+                body.appendString(lineBreak)
+            }
+        }
+        
+        body.appendString("--\(boundaryId)--\(lineBreak)")
+        
+        return body
+    }
+    
+    private func getFileName(index: Int, namesArray: [String]?) -> String {
+        let imageName: String = "\"image"
+        let jpegSuffix: String = ".jpeg\""
+        guard let names = namesArray else {
+            return imageName + jpegSuffix
+        }
+        return index < names.count ? "\"\(names[index])\(jpegSuffix)" : imageName + jpegSuffix
+    }
+    
+}
+
+extension HttpRequester {
+    
+    fileprivate func debugPrint(_ str: String = "") {
         //Print only in debug mode (ignore in release)
         #if DEBUG
-        print("HttpRequester --->>> Print only in debug mode")
         print(str)
         #endif
     }
     
 }
-
