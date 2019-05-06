@@ -58,6 +58,7 @@ public class HttpRequester {
                                 headerParams: [String: String]? = nil,
                                 bodyParams: [String: Any]? = nil,
                                 queryParams: [String: String]? = nil,
+                                name: String,
                                 dataArray: [Data?]? = nil,
                                 namesArray: [String]? = nil,
                                 completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
@@ -81,6 +82,7 @@ public class HttpRequester {
                          queryParams: [String: String]?,
                          dataArray: [Data?]? = nil,
                          namesArray: [String]? = nil,
+                         name: String = "",
                          completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
         
         //Check for vaild main url
@@ -110,6 +112,7 @@ public class HttpRequester {
                 let boundaryId: String = "Boundary-\(UUID().uuidString)"
                 request.setValue("multipart/form-data; boundary=\(boundaryId)", forHTTPHeaderField: "Content-Type")
                 let body: Data = self.dataBody(bodyParams: bodyParams,
+                                               name: name,
                                                data: dataArray,
                                                namesArray: namesArray,
                                                boundaryId: boundaryId)
@@ -168,6 +171,7 @@ public class HttpRequester {
     }
     
     func dataBody(bodyParams: [String: Any]?,
+                  name: String,
                   data: [Data?]?,
                   namesArray: [String]?,
                   boundaryId: String) -> Data {
@@ -196,7 +200,7 @@ public class HttpRequester {
         for (i, dat) in data.enumerated() {
             if let d = dat {
                 body.appendString("--\(boundaryId + lineBreak)")
-                body.appendString("\(contentDisposition) name=\"attachments\"; filename=\(self.getFileName(index: i, namesArray: namesArray))\(lineBreak)")
+                body.appendString("\(contentDisposition) name=\"\(name)\"; filename=\(self.getFileName(index: i, namesArray: namesArray))\(lineBreak)")
                 body.appendString("Content-Type: image/jpeg" + "\(lineBreak + lineBreak)")
                 body.append(d)
                 body.appendString(lineBreak)
