@@ -69,7 +69,8 @@ public class HttpRequester {
                      bodyParams: bodyParams,
                      queryParams: queryParams,
                      dataArray: dataArray,
-                     namesArray: namesArray) { (data, statusCode, error) in
+                     namesArray: namesArray,
+                     name: name) { (data, statusCode, error) in
                         completion(data, statusCode, error)
         }
     }
