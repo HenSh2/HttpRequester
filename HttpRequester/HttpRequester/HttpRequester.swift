@@ -181,20 +181,23 @@ public class HttpRequester {
             return Data()
         }
         
-        guard let bParams = bodyParams as? [String: String] else {
-            self.debugPrint("provide only strings in body params --->>> [String: String]")
-            return Data()
-        }
-        
         let lineBreak: String = "\r\n"
         let contentDisposition: String = "Content-Disposition: form-data;"
         var body = Data()
         
-        //Add all body params as data
-        for (key, value) in bParams {
-            body.appendString("--\(boundaryId + lineBreak)")
-            body.appendString("\(contentDisposition) name=\"\(key)\"\(lineBreak + lineBreak)")
-            body.appendString("\(value + lineBreak)")
+        if let bParams = bodyParams as? [String: String] {
+            //Add all body params as data
+            for (key, value) in bParams {
+                body.appendString("--\(boundaryId + lineBreak)")
+                body.appendString("\(contentDisposition) name=\"\(key)\"\(lineBreak + lineBreak)")
+                body.appendString("\(value + lineBreak)")
+            }
+        } else {
+            if bodyParams != nil {
+                self.debugPrint("provide only strings in body params --->>> [String: String]")
+            } else {
+                self.debugPrint("bodyParams --->>> nil")
+            }
         }
         
         //Add data with boundary
