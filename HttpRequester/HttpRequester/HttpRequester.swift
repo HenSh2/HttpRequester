@@ -140,10 +140,14 @@ public class HttpRequester {
                 self.debugPrint("URL --->>> \(response?.url?.absoluteString ?? "response is nil"), statusCode --->>> \(statusCode)")
                 guard let data = data else {
                     self.debugPrint("raw data is empty")
-                    completion(Data(), statusCode, false)
+                    DispatchQueue.main.async {
+                        completion(Data(), statusCode, false)
+                    }
                     return
                 }
-                completion(data, statusCode, false)
+                DispatchQueue.main.async {
+                    completion(data, statusCode, false)
+                }
                 return
             }
             self.debugPrint("URL --->>> \(response?.url?.absoluteString ?? "response is nil"), error --->>> \(error.debugDescription)")
