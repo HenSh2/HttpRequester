@@ -30,6 +30,8 @@ public class HttpRequester {
         self.sessionConfiguration.timeoutIntervalForResource = 20.0
     }
     
+    public typealias HttpRequesterCompletion = (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()
+    
     public static let shared: HttpRequester = HttpRequester()
     
     private let sessionConfiguration: URLSessionConfiguration = URLSessionConfiguration.default
@@ -40,7 +42,7 @@ public class HttpRequester {
                         headerParams: [String: String]? = nil,
                         bodyParams: [String: Any]? = nil,
                         queryParams: [String: String]? = nil,
-                        completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
+                        completion: @escaping HttpRequesterCompletion) {
         self.request(urlString: urlString,
                      httpMethod: httpMethod,
                      headerType: headerType,
@@ -61,7 +63,7 @@ public class HttpRequester {
                                 name: String,
                                 dataArray: [Data?]? = nil,
                                 namesArray: [String]? = nil,
-                                completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
+                                completion: @escaping HttpRequesterCompletion) {
         self.request(urlString: urlString,
                      httpMethod: httpMethod,
                      headerType: .MultiPart,
@@ -84,7 +86,7 @@ public class HttpRequester {
                          dataArray: [Data?]? = nil,
                          namesArray: [String]? = nil,
                          name: String = "",
-                         completion: @escaping (_ data: Data, _ statusCode: Int, _ error: Bool) -> ()) {
+                         completion: @escaping HttpRequesterCompletion) {
         
         //Check for vaild main url
         guard var mainURL = URL(string: urlString) else {
