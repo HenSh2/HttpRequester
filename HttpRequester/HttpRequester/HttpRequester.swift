@@ -40,7 +40,7 @@ public class HttpRequester {
                         httpMethod: HttpMethod = HttpMethod.GET,
                         headerType: HeaderField = .ApplicationJson,
                         headerParams: [String: String]? = nil,
-                        bodyParams: [String: Any]? = nil,
+                        bodyParams: [String: Any?]? = nil,
                         queryParams: [String: String]? = nil,
                         completion: @escaping HttpRequesterCompletion) {
         self.request(urlString: urlString,
@@ -58,7 +58,7 @@ public class HttpRequester {
     public func uploadMultiPart(urlString: String,
                                 httpMethod: HttpMethod = HttpMethod.POST,
                                 headerParams: [String: String]? = nil,
-                                bodyParams: [String: Any]? = nil,
+                                bodyParams: [String: Any?]? = nil,
                                 queryParams: [String: String]? = nil,
                                 name: String,
                                 dataArray: [Data?]? = nil,
@@ -81,7 +81,7 @@ public class HttpRequester {
                          httpMethod: HttpMethod,
                          headerType: HeaderField,
                          headerParams: [String: String]?,
-                         bodyParams: [String: Any]?,
+                         bodyParams: [String: Any?]?,
                          queryParams: [String: String]?,
                          dataArray: [Data?]? = nil,
                          namesArray: [String]? = nil,
@@ -177,7 +177,7 @@ public class HttpRequester {
         return String(querey.dropLast())
     }
     
-    func dataBody(bodyParams: [String: Any]?,
+    func dataBody(bodyParams: [String: Any?]?,
                   name: String,
                   data: [Data?]?,
                   namesArray: [String]?,
